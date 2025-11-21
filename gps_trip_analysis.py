@@ -155,7 +155,7 @@ def create_kml(points, stop_points, left_turn_points, output_filename="output.km
 
 
     kml.save(output_filename)
-    print(f"[✓] Decorated KML created: {output_filename}")
+    print(f"KML created. File: {output_filename}")
 
 
 def main():
@@ -184,7 +184,7 @@ def main():
         print("No GPS coordinates found in files.")
         sys.exit(1)
 
-    create_kml(all_points, all_stops, all_turns, "gps_track_output.kml")
+    create_kml(all_points, all_stops, all_turns, "gps_output.kml")
 
 
 if __name__ == "__main__":
