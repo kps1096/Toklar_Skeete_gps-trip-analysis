@@ -381,6 +381,7 @@
         </Placemark>
         <Placemark id="7">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#8</styleUrl>
             <Point id="6">
                 <coordinates>-77.44058,43.14121,3</coordinates>
@@ -388,6 +389,7 @@
         </Placemark>
         <Placemark id="12">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#13</styleUrl>
             <Point id="11">
                 <coordinates>-77.44058333333334,43.14121166666667,3</coordinates>
@@ -395,6 +397,7 @@
         </Placemark>
         <Placemark id="17">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#18</styleUrl>
             <Point id="16">
                 <coordinates>-77.440605,43.141225,3</coordinates>
@@ -402,6 +405,7 @@
         </Placemark>
         <Placemark id="22">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#23</styleUrl>
             <Point id="21">
                 <coordinates>-77.44060666666665,43.14122666666667,3</coordinates>
@@ -409,6 +413,7 @@
         </Placemark>
         <Placemark id="27">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#28</styleUrl>
             <Point id="26">
                 <coordinates>-77.44062333333333,43.141236666666664,3</coordinates>
@@ -416,6 +421,7 @@
         </Placemark>
         <Placemark id="32">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#33</styleUrl>
             <Point id="31">
                 <coordinates>-77.440625,43.141238333333334,3</coordinates>
@@ -423,6 +429,7 @@
         </Placemark>
         <Placemark id="37">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#38</styleUrl>
             <Point id="36">
                 <coordinates>-77.44064833333333,43.141255,3</coordinates>
@@ -430,6 +437,7 @@
         </Placemark>
         <Placemark id="42">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#43</styleUrl>
             <Point id="41">
                 <coordinates>-77.44065166666665,43.14125666666667,3</coordinates>
@@ -437,6 +445,7 @@
         </Placemark>
         <Placemark id="47">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#48</styleUrl>
             <Point id="46">
                 <coordinates>-77.44067,43.14127166666667,3</coordinates>
@@ -444,6 +453,7 @@
         </Placemark>
         <Placemark id="52">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#53</styleUrl>
             <Point id="51">
                 <coordinates>-77.44067166666667,43.141273333333324,3</coordinates>
@@ -451,6 +461,7 @@
         </Placemark>
         <Placemark id="57">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#58</styleUrl>
             <Point id="56">
                 <coordinates>-77.46389500000001,43.13712,3</coordinates>
@@ -458,6 +469,7 @@
         </Placemark>
         <Placemark id="62">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#63</styleUrl>
             <Point id="61">
                 <coordinates>-77.46389,43.13709666666667,3</coordinates>
@@ -465,6 +477,7 @@
         </Placemark>
         <Placemark id="67">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#68</styleUrl>
             <Point id="66">
                 <coordinates>-77.46389,43.13709666666667,3</coordinates>
@@ -472,6 +485,7 @@
         </Placemark>
         <Placemark id="72">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#73</styleUrl>
             <Point id="71">
                 <coordinates>-77.46409166666668,43.131629999999994,3</coordinates>
@@ -479,6 +493,7 @@
         </Placemark>
         <Placemark id="77">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#78</styleUrl>
             <Point id="76">
                 <coordinates>-77.46409,43.131631666666664,3</coordinates>
@@ -486,6 +501,7 @@
         </Placemark>
         <Placemark id="82">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#83</styleUrl>
             <Point id="81">
                 <coordinates>-77.46408166666667,43.13165333333333,3</coordinates>
@@ -493,6 +509,7 @@
         </Placemark>
         <Placemark id="87">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#88</styleUrl>
             <Point id="86">
                 <coordinates>-77.46408333333333,43.13165333333333,3</coordinates>
@@ -500,6 +517,7 @@
         </Placemark>
         <Placemark id="92">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#93</styleUrl>
             <Point id="91">
                 <coordinates>-77.47547666666667,43.13031666666667,3</coordinates>
@@ -507,6 +525,7 @@
         </Placemark>
         <Placemark id="97">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#98</styleUrl>
             <Point id="96">
                 <coordinates>-77.47547666666667,43.13031666666667,3</coordinates>
@@ -514,6 +533,7 @@
         </Placemark>
         <Placemark id="102">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#103</styleUrl>
             <Point id="101">
                 <coordinates>-77.52871833333333,43.128653333333325,3</coordinates>
@@ -521,6 +541,7 @@
         </Placemark>
         <Placemark id="107">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#108</styleUrl>
             <Point id="106">
                 <coordinates>-77.603445,43.09527833333333,3</coordinates>
@@ -528,6 +549,7 @@
         </Placemark>
         <Placemark id="112">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#113</styleUrl>
             <Point id="111">
                 <coordinates>-77.603445,43.09527833333333,3</coordinates>
@@ -535,6 +557,7 @@
         </Placemark>
         <Placemark id="117">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#118</styleUrl>
             <Point id="116">
                 <coordinates>-77.61329333333333,43.094935,3</coordinates>
@@ -542,6 +565,7 @@
         </Placemark>
         <Placemark id="122">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#123</styleUrl>
             <Point id="121">
                 <coordinates>-77.61328833333333,43.09493333333333,3</coordinates>
@@ -549,6 +573,7 @@
         </Placemark>
         <Placemark id="127">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#128</styleUrl>
             <Point id="126">
                 <coordinates>-77.61326833333332,43.094924999999996,3</coordinates>
@@ -556,6 +581,7 @@
         </Placemark>
         <Placemark id="132">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#133</styleUrl>
             <Point id="131">
                 <coordinates>-77.61326833333332,43.094926666666666,3</coordinates>
@@ -563,6 +589,7 @@
         </Placemark>
         <Placemark id="137">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#138</styleUrl>
             <Point id="136">
                 <coordinates>-77.68075833333334,43.08573333333334,3</coordinates>
@@ -570,6 +597,7 @@
         </Placemark>
         <Placemark id="142">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#143</styleUrl>
             <Point id="141">
                 <coordinates>-77.68076666666666,43.08573666666666,3</coordinates>
@@ -577,6 +605,7 @@
         </Placemark>
         <Placemark id="147">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#148</styleUrl>
             <Point id="146">
                 <coordinates>-77.68078833333334,43.085756666666676,3</coordinates>
@@ -584,6 +613,7 @@
         </Placemark>
         <Placemark id="152">
             <name>Stop</name>
+            <Snippet/>
             <styleUrl>#153</styleUrl>
             <Point id="151">
                 <coordinates>-77.68078833333334,43.085758333333324,3</coordinates>
@@ -591,6 +621,7 @@
         </Placemark>
         <Placemark id="157">
             <name>Left Turn</name>
+            <Snippet/>
             <styleUrl>#158</styleUrl>
             <Point id="156">
                 <coordinates>-77.440605,43.141225,3</coordinates>
@@ -598,6 +629,7 @@
         </Placemark>
         <Placemark id="162">
             <name>Left Turn</name>
+            <Snippet/>
             <styleUrl>#163</styleUrl>
             <Point id="161">
                 <coordinates>-77.44062333333333,43.141236666666664,3</coordinates>
@@ -605,6 +637,7 @@
         </Placemark>
         <Placemark id="167">
             <name>Left Turn</name>
+            <Snippet/>
             <styleUrl>#168</styleUrl>
             <Point id="166">
                 <coordinates>-77.60346,43.09527166666667,3</coordinates>

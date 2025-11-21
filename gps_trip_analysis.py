@@ -139,15 +139,20 @@ def create_kml(points, stop_points, left_turn_points, output_filename="output.km
 
     # C
     for (lat, lon) in stop_points:
-        p = kml.newpoint(name="Stop", coords=[(lon, lat, 3)])
+        p = kml.newpoint(coords=[(lon, lat, 3)])
+        p.name = "Stop"
+        p.snippet = simplekml.Snippet("")  # prevents duplicate label in Google Earth
         p.style.iconstyle.color = simplekml.Color.red
         p.style.iconstyle.scale = 1.2
 
     # D
     for (lat, lon) in left_turn_points:
-        p = kml.newpoint(name="Left Turn", coords=[(lon, lat, 3)])
+        p = kml.newpoint(coords=[(lon, lat, 3)])
+        p.name = "Left Turn"
+        p.snippet = simplekml.Snippet("")  # prevents duplicate label
         p.style.iconstyle.color = simplekml.Color.yellow
         p.style.iconstyle.scale = 1.2
+
 
     kml.save(output_filename)
     print(f"[✓] Decorated KML created: {output_filename}")
