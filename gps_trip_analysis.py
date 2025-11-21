@@ -111,7 +111,14 @@ def parse_lat_lon(nmea_lat, lat_dir, nmea_lon, lon_dir):
 
     return lat, lon
 
-
+###################################
+# From instructions:
+# Decorate the KML file with markers for:
+#   A. A yellow line along the route of travel.
+#   B. Do not worry about the altitude. You can set that a 3 meters or something fixed.
+#   C. A red marker if the car stopped for a stop sign or traffic light.
+#   D. A yellow marker if the car made a left turn.
+###################################
 def create_kml(points, stop_points, left_turn_points, output_filename="output.kml"):
     """
     Create a decorated KML:
@@ -123,26 +130,20 @@ def create_kml(points, stop_points, left_turn_points, output_filename="output.km
 
     kml = simplekml.Kml()
 
-    # -----------------------------------------
-    # 1. YELLOW ROUTE LINE
-    # -----------------------------------------
+    # A
     line = kml.newlinestring(name="Route")
     line.coords = [(lon, lat, 3) for (lat, lon) in points]  # altitude = 3 meters
     line.style.linestyle.color = simplekml.Color.yellow
     line.style.linestyle.width = 4
     line.altitudemode = simplekml.AltitudeMode.relativetoground
 
-    # -----------------------------------------
-    # 2. RED STOP MARKERS
-    # -----------------------------------------
+    # C
     for (lat, lon) in stop_points:
         p = kml.newpoint(name="Stop", coords=[(lon, lat, 3)])
         p.style.iconstyle.color = simplekml.Color.red
         p.style.iconstyle.scale = 1.2
 
-    # -----------------------------------------
-    # 3. YELLOW LEFT TURN MARKERS
-    # -----------------------------------------
+    # D
     for (lat, lon) in left_turn_points:
         p = kml.newpoint(name="Left Turn", coords=[(lon, lat, 3)])
         p.style.iconstyle.color = simplekml.Color.yellow
