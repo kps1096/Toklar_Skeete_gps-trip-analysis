@@ -3,7 +3,7 @@
 # Description: This script analyzes GPS trip data to calculate total distance traveled, average speed, and trip duration.
 import sys
 import os
-import simplekml
+import simplekml # type: ignore
 
 def gather_all_files(args):
     """
