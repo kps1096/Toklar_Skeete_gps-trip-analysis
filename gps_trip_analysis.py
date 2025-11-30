@@ -4,7 +4,7 @@
 import sys
 import os
 import simplekml  # type: ignore
-from math import radians, sin, cos, sqrt, atan2
+from math import radians, sin, cos, sqrt, atan2, degrees
 
 ###################################
 # From instructions:
@@ -173,33 +173,81 @@ def haversine(lat1, lon1, lat2, lon2):
     c = 2 * atan2(sqrt(a), sqrt(1-a))
     return R * c
 
-def clean_gps_data(points, min_move_m=1.0, max_jump_m=200.0):
+###################################
+# Clean duplicate stop points
+###################################
+def clean_gps_data(stop_points, cluster_radius_m=5.0):
     """
-    Very simple cleaner for your (lat, lon) tuples:
-      - removes exact duplicates / tiny movements (< min_move_m)
-      - removes crazy jumps (> max_jump_m), e.g. antenna glitches
+    Take a list of stop points [(lat, lon), ...] and
+    merge consecutive points that are within cluster_radius_m
+    of each other into a single averaged stop point.
+
+    Result: one stop marker per physical stop.
     """
-    if not points:
-        return points
+    if not stop_points:
+        return []
 
-    cleaned = [points[0]]
-    last_lat, last_lon = points[0]
+    cleaned = []
 
-    for lat, lon in points[1:]:
-        dist = haversine(last_lat, last_lon, lat, lon)
+    # start first cluster
+    current_cluster = [stop_points[0]]
+    cluster_lat, cluster_lon = stop_points[0]
 
-        # ignore tiny wiggles when parked
-        if dist < min_move_m:
-            continue
+    for lat, lon in stop_points[1:]:
+        dist = haversine(cluster_lat, cluster_lon, lat, lon)
 
-        # ignore huge impossible jumps
-        if dist > max_jump_m:
-            continue
+        if dist <= cluster_radius_m:
+            # same stop → add to current cluster and update cluster center
+            current_cluster.append((lat, lon))
+            cluster_lat = sum(p[0] for p in current_cluster) / len(current_cluster)
+            cluster_lon = sum(p[1] for p in current_cluster) / len(current_cluster)
+        else:
+            # new stop → finish old cluster
+            avg_lat = sum(p[0] for p in current_cluster) / len(current_cluster)
+            avg_lon = sum(p[1] for p in current_cluster) / len(current_cluster)
+            cleaned.append((avg_lat, avg_lon))
 
-        cleaned.append((lat, lon))
-        last_lat, last_lon = lat, lon
+            # start new cluster
+            current_cluster = [(lat, lon)]
+            cluster_lat, cluster_lon = lat, lon
+
+    # flush last cluster
+    avg_lat = sum(p[0] for p in current_cluster) / len(current_cluster)
+    avg_lon = sum(p[1] for p in current_cluster) / len(current_cluster)
+    cleaned.append((avg_lat, avg_lon))
 
     return cleaned
+
+def remove_beginning_stop_points(points, min_move_m=1.0):
+    """Remove points at the beginning until movement is detected."""
+    if len(points) < 2:
+        return points
+
+    start_index = 0
+    for i in range(1, len(points)):
+        dist = haversine(points[i-1][0], points[i-1][1],
+                         points[i][0], points[i][1])
+        if dist >= min_move_m:
+            start_index = i - 1
+            break
+
+    return points[start_index:]
+
+def remove_ending_stop_points(points, min_move_m=1.0):
+    """Remove points at the end after movement stops."""
+    if len(points) < 2:
+        return points
+
+    end_index = len(points) - 1
+    for i in range(len(points)-1, 0, -1):
+        dist = haversine(points[i][0], points[i][1],
+                         points[i-1][0], points[i-1][1])
+        if dist >= min_move_m:
+            end_index = i
+            break
+
+    return points[:end_index+1]
+
 
 def main():
     if len(sys.argv) < 2:
@@ -226,6 +274,10 @@ def main():
     if not all_points:
         print("No GPS coordinates found in files.")
         sys.exit(1)
+
+
+    all_points = remove_beginning_stop_points(all_points)
+    all_points = remove_ending_stop_points(all_points)
 
     # ---------- NEW: CLEANING STEP ----------
     print(f"Raw points: {len(all_points)}")
