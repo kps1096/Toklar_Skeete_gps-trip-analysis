@@ -1,9 +1,10 @@
 # File: gps_trip_analysis.py
-# Author: Keren Skeete
+# Author: Keren Skeete and Lara Toklar
 # Description: This script analyzes GPS trip data to calculate total distance traveled, average speed, and trip duration.
 import sys
 import os
 import simplekml  # type: ignore
+from math import radians, sin, cos, sqrt, atan2
 
 ###################################
 # From instructions:
@@ -47,7 +48,13 @@ def extract_points_from_file(filename):
 
     with open(filename, "r", errors="ignore") as f:
         for line in f:
-            if line.startswith("$GPRMC"):
+
+            # Detect Arduino "burp" (two sentences in one line)
+            if line.count("$") > 1:
+                # More than one GPS sentence → invalid line
+                continue
+
+            elif line.startswith("$GPRMC"):
                 parts = line.strip().split(",")
 
                 if len(parts) > 8 and parts[3] != "" and parts[5] != "":
@@ -157,6 +164,42 @@ def create_kml(points, stop_points, left_turn_points, output_filename="output.km
     kml.save(output_filename)
     print(f"KML created. File: {output_filename}")
 
+def haversine(lat1, lon1, lat2, lon2):
+    """Return distance in meters between two lat/lon points."""
+    R = 6371000  # Earth radius in meters
+    dlat = radians(lat2 - lat1)
+    dlon = radians(lon2 - lon1)
+    a = sin(dlat/2)**2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon/2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1-a))
+    return R * c
+
+def clean_gps_data(points, min_move_m=1.0, max_jump_m=200.0):
+    """
+    Very simple cleaner for your (lat, lon) tuples:
+      - removes exact duplicates / tiny movements (< min_move_m)
+      - removes crazy jumps (> max_jump_m), e.g. antenna glitches
+    """
+    if not points:
+        return points
+
+    cleaned = [points[0]]
+    last_lat, last_lon = points[0]
+
+    for lat, lon in points[1:]:
+        dist = haversine(last_lat, last_lon, lat, lon)
+
+        # ignore tiny wiggles when parked
+        if dist < min_move_m:
+            continue
+
+        # ignore huge impossible jumps
+        if dist > max_jump_m:
+            continue
+
+        cleaned.append((lat, lon))
+        last_lat, last_lon = lat, lon
+
+    return cleaned
 
 def main():
     if len(sys.argv) < 2:
@@ -183,6 +226,14 @@ def main():
     if not all_points:
         print("No GPS coordinates found in files.")
         sys.exit(1)
+
+    # ---------- NEW: CLEANING STEP ----------
+    print(f"Raw points: {len(all_points)}")
+    all_points = clean_gps_data(all_points)
+    all_stops  = clean_gps_data(all_stops)
+    all_turns  = clean_gps_data(all_turns)
+    print(f"Cleaned points: {len(all_points)}")
+    # ----------------------------------------
 
     create_kml(all_points, all_stops, all_turns, "gps_output.kml")
 
