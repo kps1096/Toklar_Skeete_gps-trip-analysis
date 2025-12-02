@@ -5,6 +5,8 @@ import sys
 import os
 import simplekml  # type: ignore
 from math import radians, sin, cos, sqrt, atan2, degrees
+from datetime import datetime, timedelta
+import statistics
 
 ###################################
 # From instructions:
@@ -249,6 +251,170 @@ def remove_ending_stop_points(points, min_move_m=1.0):
     return points[:end_index+1]
 
 
+def format_seconds_hms(total_seconds):
+    """Helper to turn seconds into H:MM:SS string."""
+    if total_seconds is None:
+        return "N/A"
+    if total_seconds < 0:
+        total_seconds = 0
+
+    total_seconds = int(round(total_seconds))
+    hours, rem = divmod(total_seconds, 3600)
+    minutes, seconds = divmod(rem, 60)
+    return f"{hours:d}:{minutes:02d}:{seconds:02d}"
+
+def compute_trip_duration(timed_points, speed_threshold_knots=0.5):
+    """
+    Compute trip duration based on moving segments only.
+    Also detect if the log starts/ends while the car is already moving.
+
+    Returns a dict with:
+        recorded_seconds
+        estimated_seconds
+        start_in_motion
+        end_in_motion
+        median_dt
+    """
+    if not timed_points:
+        return None
+
+    # Sort by time just in case
+    pts = sorted(timed_points, key=lambda p: p["time"])
+
+    # Compute typical sampling interval (median dt)
+    dts = []
+    for i in range(len(pts) - 1):
+        dt = (pts[i + 1]["time"] - pts[i]["time"]).total_seconds()
+        if dt > 0:
+            dts.append(dt)
+    median_dt = statistics.median(dts) if dts else 0.0
+
+    # Find indices where car is moving
+    moving_indices = [
+        i
+        for i, p in enumerate(pts)
+        if p["speed_knots"] is not None and p["speed_knots"] > speed_threshold_knots
+    ]
+
+    if not moving_indices:
+        # Car never moved according to speed threshold
+        return None
+
+    i_start = moving_indices[0]
+    i_end = moving_indices[-1]
+
+    start_time = pts[i_start]["time"]
+    end_time = pts[i_end]["time"]
+    recorded_seconds = (end_time - start_time).total_seconds()
+
+    # Detect if file begins while moving
+    start_in_motion = (
+        i_start == 0
+        and pts[0]["speed_knots"] is not None
+        and pts[0]["speed_knots"] > speed_threshold_knots
+    )
+
+    # Detect if file ends while moving
+    end_in_motion = (
+        i_end == len(pts) - 1
+        and pts[-1]["speed_knots"] is not None
+        and pts[-1]["speed_knots"] > speed_threshold_knots
+    )
+
+    # Simple estimation: add one "typical" interval at each side where we're missing
+    missing_start = median_dt if start_in_motion else 0.0
+    missing_end = median_dt if end_in_motion else 0.0
+    estimated_seconds = recorded_seconds + missing_start + missing_end
+
+    return {
+        "recorded_seconds": recorded_seconds,
+        "estimated_seconds": estimated_seconds,
+        "start_in_motion": start_in_motion,
+        "end_in_motion": end_in_motion,
+        "median_dt": median_dt,
+    }
+
+###################################
+# Time parsing & trip-duration analysis
+###################################
+def parse_nmea_datetime(time_str, date_str):
+    """
+    Parse NMEA time and date from RMC sentence into a Python datetime.
+
+    time_str: 'hhmmss' or 'hhmmss.sss'
+    date_str: 'ddmmyy'
+    """
+    if not time_str or not date_str:
+        return None
+
+    try:
+        # Time
+        hh = int(time_str[0:2])
+        mm = int(time_str[2:4])
+        ss = float(time_str[4:])
+        sec = int(ss)
+        micro = int((ss - sec) * 1_000_000)
+
+        # Date
+        day = int(date_str[0:2])
+        month = int(date_str[2:4])
+        year = int(date_str[4:6])
+        # NMEA uses 2-digit year
+        year += 2000 if year < 80 else 1900
+
+        return datetime(year, month, day, hh, mm, sec, micro)
+    except Exception:
+        return None
+
+def extract_timed_points_from_file(filename):
+    """
+    Read a GPS file and return a list of dicts:
+        {
+            'time': datetime,
+            'lat': float,
+            'lon': float,
+            'speed_knots': float
+        }
+    Only uses $GPRMC (has both time and date).
+    """
+    timed_points = []
+
+    with open(filename, "r", errors="ignore") as f:
+        for line in f:
+
+            # Skip Arduino "burp" lines with multiple sentences
+            if line.count("$") > 1:
+                continue
+
+            if line.startswith("$GPRMC"):
+                parts = line.strip().split(",")
+
+                # Need time, status, lat, N/S, lon, E/W, speed, date
+                if len(parts) > 9 and parts[2] == "A" and parts[3] and parts[5]:
+                    nmea_time = parts[1]
+                    nmea_date = parts[9]
+                    dt = parse_nmea_datetime(nmea_time, nmea_date)
+                    if dt is None:
+                        continue
+
+                    lat, lon = parse_lat_lon(parts[3], parts[4], parts[5], parts[6])
+
+                    try:
+                        speed_knots = float(parts[7]) if parts[7] else 0.0
+                    except:
+                        speed_knots = 0.0
+
+                    timed_points.append(
+                        {
+                            "time": dt,
+                            "lat": lat,
+                            "lon": lon,
+                            "speed_knots": speed_knots,
+                        }
+                    )
+
+    return timed_points
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: python gps_to_kml.py <gps files or folder>")
@@ -263,6 +429,8 @@ def main():
     all_points = []
     all_stops = []
     all_turns = []
+    all_timed_points = []
+
 
     for gps_file in files:
         print(f"[Reading] {gps_file}")
@@ -270,6 +438,10 @@ def main():
         all_points.extend(pts)
         all_stops.extend(stops)
         all_turns.extend(turns)
+
+        # Also gather timed points for trip-duration analysis
+        timed_pts = extract_timed_points_from_file(gps_file)
+        all_timed_points.extend(timed_pts)
 
     if not all_points:
         print("No GPS coordinates found in files.")
@@ -288,6 +460,36 @@ def main():
     # ----------------------------------------
 
     create_kml(all_points, all_stops, all_turns, "gps_output.kml")
+
+    trip_info = compute_trip_duration(all_timed_points)
+
+    if trip_info is None:
+        print("Could not compute trip duration (no moving points with valid time).")
+    else:
+        rec = trip_info["recorded_seconds"]
+        est = trip_info["estimated_seconds"]
+        start_in_motion = trip_info["start_in_motion"]
+        end_in_motion = trip_info["end_in_motion"]
+
+        print()
+        print("=== Trip Duration Report ===")
+        print(f"Recorded trip time (first moving point to last moving point): {format_seconds_hms(rec)}")
+
+        # Report if log started/ended while moving
+        if start_in_motion:
+            print("Note: GPS file appears to START while the car is already moving.")
+        if end_in_motion:
+            print("Note: GPS file appears to STOP while the car is still moving.")
+
+        if start_in_motion or end_in_motion:
+            print(
+                f"Estimated trip time including missing data at start/end: {format_seconds_hms(est)}"
+            )
+        else:
+            # If no missing segments found, estimated == recorded
+            print("No missing moving segments detected at start or end of file.")
+    # ----------------------------------
+
 
 
 if __name__ == "__main__":
